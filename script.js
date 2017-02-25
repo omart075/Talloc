@@ -1,4 +1,21 @@
 // script.js
+
+var timeout = null;
+document.addEventListener("DOMSubtreeModified",
+function()
+{
+	if(timeout)clearTimeout(timeout);
+	timeout = setTimeout(listener, 1000);
+}, false);
+
+
+function listener()
+{
+  console.log("here");
+  console.log(document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth);
+}
+
+
 var videoUrl = document.location.href;
 var videoId = videoUrl.split("v=")[1];
 
@@ -47,6 +64,18 @@ chrome.runtime.sendMessage({
 
     }
     console.log(tracklist);
+
+
+
+    //console.log(document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth);
+    var a = document.createElement("div");
+    a.setAttribute("id", "square");
+    a.setAttribute("style", "width:10px; height:5px; background:yellow; left: 0px; transform: translateX(50%);");
+    document.getElementsByClassName("ytp-progress-bar")[0].appendChild(a);
+
+
+
+
 });
 
 //response.items[0].snippet.topLevelComment.snippet.textOriginal
