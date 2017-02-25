@@ -17,17 +17,19 @@ chrome.runtime.sendMessage({
       var str = response.items[i].snippet.topLevelComment.snippet.textOriginal;
 
       let m;
-
+      var count = 0;
       while ((m = regex.exec(str)) !== null) {
+
         // This is necessary to avoid infinite loops with zero-width matches
         if (m.index === regex.lastIndex) {
           regex.lastIndex++;
         }
-
+        count++;
         // The result can be accessed through the `m`-variable.
         m.forEach((match, groupIndex) => {
         console.log(`Found match, group ${groupIndex}: ${match}`);
         });
+
       }
 
 
