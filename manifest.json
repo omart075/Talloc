@@ -5,13 +5,16 @@
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": ["https://youtube.com/*"],
+      "matches": ["https://www.youtube.com/*"],
 
       "js": ["script.js"]
     }
   ],
+  "permissions": [
+    "tabs"
+  ],
   "background": {
     "scripts": ["background.js"],
-    "persistent": true
+    "persistent": false
     }
 }
