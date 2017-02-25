@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener(
       //when request has returned, send data to callback function
       xhttp.onload = function(){
         console.log(xhttp.responseText)
-        callback(xhttp.responseText);
+        callback(JSON.parse(xhttp.responseText));
       }
       return true
   }

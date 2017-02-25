@@ -8,8 +8,31 @@ console.log(videoId);
 //callback function returns comments
 chrome.runtime.sendMessage({
   method: 'GET',
-  url:'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=' + videoId + '&key=AIzaSyDvt7MmIIHpp3p_HP-pvU26bsZlaQhfR5s',
+  url:'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=' + videoId + '&key=AIzaSyDvt7MmIIHpp3p_HP-pvU26bsZlaQhfR5s&maxResults=100',
   data: ''
 }, function(response){
-  console.log(response);
+    var n = response.items.length;
+    for(var i = 0; i < n; i++){
+      const regex = /[0-9]{1,2}:[0-9]{1,2}[A-Z ].*/g;
+      var str = response.items[i].snippet.topLevelComment.snippet.textOriginal;
+
+      let m;
+
+      while ((m = regex.exec(str)) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === regex.lastIndex) {
+          regex.lastIndex++;
+        }
+
+        // The result can be accessed through the `m`-variable.
+        m.forEach((match, groupIndex) => {
+        console.log(`Found match, group ${groupIndex}: ${match}`);
+        });
+      }
+
+
+      //console.log(wholeText.match(regex));
+    }
 });
+
+//response.items[0].snippet.topLevelComment.snippet.textOriginal
