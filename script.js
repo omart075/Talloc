@@ -12,29 +12,41 @@ chrome.runtime.sendMessage({
   data: ''
 }, function(response){
     var n = response.items.length;
+    var temp = [];
+    var tracklist = [];
+
+
     for(var i = 0; i < n; i++){
       const regex = /[0-9]{1,2}:[0-9]{1,2}[A-Z ].*/g;
       var str = response.items[i].snippet.topLevelComment.snippet.textOriginal;
 
       let m;
-      var count = 0;
+      if(temp.length >= 2)
+      {
+        if(temp.length > tracklist.length){
+          tracklist = temp;
+        }
+        temp = [];
+      }
+      else{
+        temp = [];
+      }
       while ((m = regex.exec(str)) !== null) {
 
         // This is necessary to avoid infinite loops with zero-width matches
         if (m.index === regex.lastIndex) {
           regex.lastIndex++;
         }
-        count++;
+
         // The result can be accessed through the `m`-variable.
         m.forEach((match, groupIndex) => {
-        console.log(`Found match, group ${groupIndex}: ${match}`);
+        temp.push(`Found match, group ${groupIndex}: ${match}`);
         });
 
       }
 
-
-      //console.log(wholeText.match(regex));
     }
+    console.log(tracklist);
 });
 
 //response.items[0].snippet.topLevelComment.snippet.textOriginal
