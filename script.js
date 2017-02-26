@@ -49,18 +49,19 @@ chrome.runtime.sendMessage({
 
         var timeStampPost = Number(tracklist[i].split(":")[1]);
 
-        var timeStampInSec = timeStampPre * 60 + timeStampPost;
+        var timeStampInSec = (timeStampPre * 60) + timeStampPost;
 
         var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
 
-        var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
+        var vidLengthInSec = (Number(vidLength.split(":")[0]) * 60) + Number(vidLength.split(":")[1]);
 
 
         var secPerPx = vidLengthInSec / vidWidthPx;
 
         //position of time stamp
-        var timeStampPos = (timeStampInSec / secPerPx - 5);
+        var timeStampPos = (timeStampInSec / secPerPx);
         //positions.push(timeStampPos);
+        console.log(timeStampPos)
 
         //make the element css
         var a = document.createElement("div");
@@ -97,7 +98,7 @@ chrome.runtime.sendMessage({
     //function to get title of element being hovered over
     function songInfo(index){
 
-      const regex3 = /[a-zA-Z' *&._-]+/g;
+      const regex3 = /[a-zA-Z' *!&._-]+/g;
       var tracklistStr;
       var trackNames = [];
 
@@ -108,7 +109,7 @@ chrome.runtime.sendMessage({
       }
 
       tracklist = tracklistStr.match(regex3);
-      //console.log(tracklist)      
+      //console.log(tracklist)
 
 
       var trackIndex = index.id.split("e")[1];
