@@ -17,6 +17,7 @@ chrome.runtime.sendMessage({
     //regex matching to get tracklist from description
     const regex1 = /[A-Z].*[0-9]{1,2}:[0-9]{1,2}/g;
     var tracklistArr = descr.match(regex1);
+    console.log(tracklistArr)
     var tracklistStr;
     var tracklist;
 
@@ -34,7 +35,6 @@ chrome.runtime.sendMessage({
     const regex2 = /[0-9]{1,2}:[0-9]{1,2}/g;
     tracklist = tracklistStr.match(regex2);
 
-    console.log(tracklist)
 
     //renders time stamps onto video
     function generateTimeStamps(){
@@ -96,6 +96,20 @@ chrome.runtime.sendMessage({
 
     //function to get title of element being hovered over
     function songInfo(index){
+
+      const regex3 = /[a-zA-Z' *&._-]+/g;
+      var tracklistStr;
+      var trackNames = [];
+
+      for(var i = 0; i < tracklistArr.length; i++){
+        if(tracklistArr[i] != ""){
+          tracklistStr += tracklistArr[i] + "\n";
+        }
+      }
+
+      tracklist = tracklistStr.match(regex3);
+      //console.log(tracklist)      
+
 
       var trackIndex = index.id.split("e")[1];
       var trackName = tracklist[trackIndex];
