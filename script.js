@@ -1,7 +1,5 @@
 // script.js
 
-
-
 var vidWidthPx = 0;
 
 var videoUrl = document.location.href;
@@ -20,11 +18,16 @@ chrome.runtime.sendMessage({
     var temp = [];
     var tracklist = [];
 
-
+    //for every comment the video has
     for(var i = 0; i < n; i++){
+      //regex we will be matching with
       const regex = /[0-9]{1,2}:[0-9]{1,2}[A-Z ].*/g;
+
+      //Actual text from comment
       var str = response.items[i].snippet.topLevelComment.snippet.textOriginal;
 
+      //if comment has 2 or more time stamps, we update tracklist to the biggest
+      //tracklist found in the comments and resets temp
       let m;
       if(temp.length >= 2)
       {
@@ -36,6 +39,7 @@ chrome.runtime.sendMessage({
       else{
         temp = [];
       }
+      //regex matching process
       while ((m = regex.exec(str)) !== null) {
 
         // This is necessary to avoid infinite loops with zero-width matches
@@ -51,10 +55,15 @@ chrome.runtime.sendMessage({
       }
 
     }
-    //console.log(tracklist);
+
+    //renders time stamps onto video
     function generateTimeStamps(){
       console.log(tracklist)
+
+      //for every song in the tracklist
       for(var i = 0; i < tracklist.length; i++){
+
+        //values to calculate position of time stamp
         vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
 
         var timeStampPre = Number(tracklist[i].split(":")[0]);
@@ -67,24 +76,29 @@ chrome.runtime.sendMessage({
 
         var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
 
-        //console.log(vidLengthInSec + " " + vidWidthPx);
+
         var secPerPx = vidLengthInSec / vidWidthPx;
-        //console.log(timeStampInSec + " " + secPerPx);
+
+        //position of time stamp
         var timeStampPos = (timeStampInSec / secPerPx - 5);
-        //console.log(timeStampPos)
-        //console.log(document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth);
+
+        //make the element css
         var a = document.createElement("div");
         a.setAttribute("id", "square" + i);
-        a.setAttribute("style", "width:5px; height:2.5px; background:orange; margin-bottom: 2px; display: inline-block; transform: translateX(" + timeStampPos + "px);");
-        //a.setAttribute("onmouseover", "songInfo(event)");
+        a.setAttribute("style", "width:5px; height:2.5px; background:white; margin-bottom: 2px; display: inline-block; transform: translateX(" + timeStampPos + "px);");
+
+        //append to video
         document.getElementsByClassName("ytp-progress-bar-padding")[0].appendChild(a);
 
+        //when you hover over the time stamp, it displays the song title
+        //when you  hover off, it removes the song title
         element = document.getElementById("square" + i);
         element.onmouseover = function(){songInfo(this)};
         element.onmouseout = function(){removeTitle(this)};
     }
 }
 
+//function to remove song title after you hover off the time stamp
 function removeTimeStamps(){
   for (var i=0; i < tracklist.length; i++)
   {
@@ -95,6 +109,7 @@ function removeTimeStamps(){
   }
 }
 
+//listener for any changes (video size) on the screen
 var timeout = null;
 document.addEventListener("DOMSubtreeModified",
 function(){
@@ -107,30 +122,30 @@ function listener()
 {
 }
 
+//function call to generate the time stamps
 generateTimeStamps();
 
+//function to get title of element being hovered over
 function songInfo(index){
   var trackIndex = index.id.split("e")[1];
   var trackName = tracklist[trackIndex];
 
+  //regex matching to get song title
   const regex = /[A-Z].*/g;
   trackName = trackName.match(regex)[0]
 
+  //creating the css for the element and appending it to the video controls bar
   var a = document.createElement("p");
   a.setAttribute("id", "title" + trackIndex)
   a.setAttribute("style", "color: white; display: inline; float:right");
   a.innerHTML = trackName;
   document.getElementsByClassName("ytp-left-controls")[0].appendChild(a);
-  console.log(a.id);
-
-
 }
 
+//function to remove title after you hover off time stamp
 function removeTitle(index){
   var trackIndex = index.id.split("e")[1];
-  console.log(trackIndex)
   var element = document.getElementById("title" + trackIndex);
-  console.log(element);
   element.parentNode.removeChild(element);
 }
 
