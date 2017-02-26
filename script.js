@@ -45,7 +45,7 @@ chrome.runtime.sendMessage({
 
         // The result can be accessed through the `m`-variable.
         m.forEach((match, groupIndex) => {
-        temp.push(match);
+          temp.push(match);
         });
 
       }
@@ -53,37 +53,39 @@ chrome.runtime.sendMessage({
     }
     //console.log(tracklist);
     function generateTimeStamps(){
-    console.log(tracklist)
-    for(var i = 0; i < tracklist.length; i++){
-    vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
+      console.log(tracklist)
+      for(var i = 0; i < tracklist.length; i++){
+        vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
 
-    var timeStampPre = Number(tracklist[i].split(":")[0]);
+        var timeStampPre = Number(tracklist[i].split(":")[0]);
 
-    var timeStampPost = Number(tracklist[i].split(":")[1].split(" ")[0]);
+        var timeStampPost = Number(tracklist[i].split(":")[1].split(" ")[0]);
 
-    var timeStampInSec = timeStampPre * 60 + Number(timeStampPost);
+        var timeStampInSec = timeStampPre * 60 + Number(timeStampPost);
 
-    var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
+        var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
 
-    var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
+        var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
 
-    //console.log(vidLengthInSec + " " + vidWidthPx);
-    var secPerPx = vidLengthInSec / vidWidthPx;
-    //console.log(timeStampInSec + " " + secPerPx);
-    var timeStampPos = (timeStampInSec / secPerPx - 5);
-    //console.log(timeStampPos)
-    //console.log(document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth);
-    var a = document.createElement("div");
-    a.setAttribute("id", "square" + i);
-    a.setAttribute("style", "width:5px; height:2.5px; background:orange; margin-bottom: 8px; display: inline-block; transform: translateX(" + timeStampPos + "px);");
-    document.getElementsByClassName("ytp-progress-bar")[0].appendChild(a);
+        //console.log(vidLengthInSec + " " + vidWidthPx);
+        var secPerPx = vidLengthInSec / vidWidthPx;
+        //console.log(timeStampInSec + " " + secPerPx);
+        var timeStampPos = (timeStampInSec / secPerPx - 5);
+        //console.log(timeStampPos)
+        //console.log(document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth);
+        var a = document.createElement("div");
+        a.setAttribute("id", "square" + i);
+        a.setAttribute("style", "width:5px; height:2.5px; background:orange; margin-bottom: 2px; display: inline-block; transform: translateX(" + timeStampPos + "px);");
+        //a.setAttribute("onmouseover", "songInfo(event)");
+        document.getElementsByClassName("ytp-progress-bar-padding")[0].appendChild(a);
 
-
+        element = document.getElementById("square" + i);
+        element.onmouseover = function(){songInfo(this)};
+        element.onmouseout = function(){removeTitle(this)};
+    }
 }
-}
 
-function removeTimeStamps()
-{
+function removeTimeStamps(){
   for (var i=0; i < tracklist.length; i++)
   {
     try{
@@ -92,10 +94,10 @@ function removeTimeStamps()
   } catch(err){break;}
   }
 }
+
 var timeout = null;
 document.addEventListener("DOMSubtreeModified",
-function()
-{
+function(){
 	if(timeout)clearTimeout(timeout);
 	timeout = setTimeout(listener, 1500);
 }, false);
@@ -106,6 +108,31 @@ function listener()
 }
 
 generateTimeStamps();
+
+function songInfo(index){
+  var trackIndex = index.id.split("e")[1];
+  var trackName = tracklist[trackIndex];
+
+  const regex = /[A-Z].*/g;
+  trackName = trackName.match(regex)[0]
+
+  var a = document.createElement("p");
+  a.setAttribute("id", "title" + trackIndex)
+  a.setAttribute("style", "color: white; display: inline; float:right");
+  a.innerHTML = trackName;
+  document.getElementsByClassName("ytp-left-controls")[0].appendChild(a);
+  console.log(a.id);
+
+
+}
+
+function removeTitle(index){
+  var trackIndex = index.id.split("e")[1];
+  console.log(trackIndex)
+  var element = document.getElementById("title" + trackIndex);
+  console.log(element);
+  element.parentNode.removeChild(element);
+}
 
 
 
