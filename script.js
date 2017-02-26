@@ -6,6 +6,8 @@ var videoUrl = document.location.href;
 var videoId = videoUrl.split("v=")[1];
 
 
+//send message to background to run http request to avoid cross domain policy
+//callback function returns video description
 chrome.runtime.sendMessage({
   method: 'GET',
   url:'https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + videoId + '&fields=items/snippet/description&key=AIzaSyDvt7MmIIHpp3p_HP-pvU26bsZlaQhfR5s&maxResults=50',
@@ -20,6 +22,10 @@ chrome.runtime.sendMessage({
     console.log(tracklistArr)
     var tracklistStr;
     var tracklist;
+    var positions = [];
+    var left =  0;
+    var right = 0;
+    var currPos = 0;
 
     //first regex returns array so array is made into string for next regex
     for(var i = 0; i < tracklistArr.length; i++){
@@ -60,8 +66,7 @@ chrome.runtime.sendMessage({
 
         //position of time stamp
         var timeStampPos = (timeStampInSec / secPerPx);
-        //positions.push(timeStampPos);
-        console.log(timeStampPos)
+        positions.push(timeStampPos);
 
         //make the element css
         var a = document.createElement("div");
@@ -76,6 +81,11 @@ chrome.runtime.sendMessage({
         element = document.getElementById("square" + i);
         element.onmouseover = function(){songInfo(this)};
         element.onmouseout = function(){removeTitle(this)};
+
+
+        currPos = document.getElementsByClassName("ytp-scrubber-container")[0].style.transform.addEventListener("onchange", getCurrPos);
+        console.log(currPos)
+
       }
     }
 
@@ -214,7 +224,7 @@ chrome.runtime.sendMessage({
 
         //position of time stamp
         var timeStampPos = (timeStampInSec / secPerPx - 5);
-        //positions.push(timeStampPos);
+        positions.push(timeStampPos);
 
         //make the element css
         var a = document.createElement("div");
@@ -298,3 +308,8 @@ chrome.runtime.sendMessage({
     // displayTitle();
 
 });
+
+function getCurrPos(){
+  var currPos = Number(document.getElementsByClassName("ytp-scrubber-container")[0].style.transform.split("(")[1].split(")")[0].split("p")[0]);
+  return currPos;
+}
