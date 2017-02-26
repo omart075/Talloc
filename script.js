@@ -5,7 +5,121 @@ var vidWidthPx = 0;
 var videoUrl = document.location.href;
 var videoId = videoUrl.split("v=")[1];
 
-//console.log(videoId);
+
+chrome.runtime.sendMessage({
+  method: 'GET',
+  url:'https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + videoId + '&fields=items/snippet/description&key=AIzaSyDvt7MmIIHpp3p_HP-pvU26bsZlaQhfR5s&maxResults=50',
+  data: ''
+}, function(response){
+    //gets video description
+    var descr = response.items[0].snippet.description;
+
+    //regex matching to get tracklist from description
+    const regex1 = /[A-Z].*[0-9]{1,2}:[0-9]{1,2}/g;
+    var tracklistArr = descr.match(regex1);
+    var tracklistStr;
+    var tracklist;
+
+    //first regex returns array so array is made into string for next regex
+    for(var i = 0; i < tracklistArr.length; i++){
+      //In case some numbers before the tracklist interfere
+      if(!tracklistArr[0].includes("00:00"))
+      {
+        tracklistArr[0] = "";
+      }
+      tracklistStr += tracklistArr[i] + "\n"
+    }
+
+    //regex to get times from tracklist
+    const regex2 = /[0-9]{1,2}:[0-9]{1,2}/g;
+    tracklist = tracklistStr.match(regex2);
+
+    console.log(tracklist)
+
+    //renders time stamps onto video
+    function generateTimeStamps(){
+
+      //for every song in the tracklist
+      for(var i = 0; i < tracklist.length; i++){
+
+        //values to calculate position of time stamp
+        vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
+
+        var timeStampPre = Number(tracklist[i].split(":")[0]);
+
+        var timeStampPost = Number(tracklist[i].split(":")[1]);
+
+        var timeStampInSec = timeStampPre * 60 + timeStampPost;
+
+        var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
+
+        var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
+
+
+        var secPerPx = vidLengthInSec / vidWidthPx;
+
+        //position of time stamp
+        var timeStampPos = (timeStampInSec / secPerPx - 5);
+        //positions.push(timeStampPos);
+
+        //make the element css
+        var a = document.createElement("div");
+        a.setAttribute("id", "square" + i);
+        a.setAttribute("style", "width:5px; height:2.5px; background:white; margin-bottom: 2px; display: inline-block; transform: translateX(" + timeStampPos + "px);");
+
+        //append to video
+        document.getElementsByClassName("ytp-progress-bar-padding")[0].appendChild(a);
+
+        //when you hover over the time stamp, it displays the song title
+        //when you  hover off, it removes the song title
+        element = document.getElementById("square" + i);
+        element.onmouseover = function(){songInfo(this)};
+        element.onmouseout = function(){removeTitle(this)};
+      }
+    }
+
+    //listener for any changes (video size) on the screen
+    var timeout = null;
+    document.addEventListener("DOMSubtreeModified",
+    function(){
+    	if(timeout)clearTimeout(timeout);
+    	timeout = setTimeout(listener, 1500);
+    }, false);
+
+
+    function listener()
+    {
+    }
+
+    //function call to generate the time stamps
+    generateTimeStamps();
+
+    //function to get title of element being hovered over
+    function songInfo(index){
+
+      var trackIndex = index.id.split("e")[1];
+      var trackName = tracklist[trackIndex];
+
+      //regex matching to get song title
+      const regex = /[A-Z].*/g;
+      trackName = trackName.match(regex)[0]
+
+      //creating the css for the element and appending it to the video controls bar
+      var a = document.createElement("p");
+      a.setAttribute("id", "title" + trackIndex)
+      a.setAttribute("style", "color: white; display: inline; float:right");
+      a.innerHTML = trackName;
+      document.getElementsByClassName("ytp-left-controls")[0].appendChild(a);
+    }
+
+    //function to remove title after you hover off time stamp
+    function removeTitle(index){
+      var trackIndex = index.id.split("e")[1];
+      var element = document.getElementById("title" + trackIndex);
+      element.parentNode.removeChild(element);
+    }
+});
+
 
 //send message to background to run http request to avoid cross domain policy
 //callback function returns comments
@@ -14,9 +128,13 @@ chrome.runtime.sendMessage({
   url:'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=' + videoId + '&key=AIzaSyDvt7MmIIHpp3p_HP-pvU26bsZlaQhfR5s&maxResults=100',
   data: ''
 }, function(response){
+
     var n = response.items.length;
     var temp = [];
     var tracklist = [];
+    var positions = [];
+    var left = 0;
+    var right = 1;
 
     //for every comment the video has
     for(var i = 0; i < n; i++){
@@ -81,6 +199,7 @@ chrome.runtime.sendMessage({
 
         //position of time stamp
         var timeStampPos = (timeStampInSec / secPerPx - 5);
+        //positions.push(timeStampPos);
 
         //make the element css
         var a = document.createElement("div");
@@ -95,62 +214,72 @@ chrome.runtime.sendMessage({
         element = document.getElementById("square" + i);
         element.onmouseover = function(){songInfo(this)};
         element.onmouseout = function(){removeTitle(this)};
+      }
     }
-}
 
-//function to remove song title after you hover off the time stamp
-function removeTimeStamps(){
-  for (var i=0; i < tracklist.length; i++)
-  {
-    try{
-    var element = document.getElementById("square" + i);
-    element.parentNode.removeChild(element);
-  } catch(err){break;}
-  }
-}
+    //function to remove song title after you hover off the time stamp
+    function removeTimeStamps(){
+      for (var i=0; i < tracklist.length; i++)
+      {
+        try{
+        var element = document.getElementById("square" + i);
+        element.parentNode.removeChild(element);
+      } catch(err){break;}
+      }
+    }
 
-//listener for any changes (video size) on the screen
-var timeout = null;
-document.addEventListener("DOMSubtreeModified",
-function(){
-	if(timeout)clearTimeout(timeout);
-	timeout = setTimeout(listener, 1500);
-}, false);
-
-
-function listener()
-{
-}
-
-//function call to generate the time stamps
-generateTimeStamps();
-
-//function to get title of element being hovered over
-function songInfo(index){
-  var trackIndex = index.id.split("e")[1];
-  var trackName = tracklist[trackIndex];
-
-  //regex matching to get song title
-  const regex = /[A-Z].*/g;
-  trackName = trackName.match(regex)[0]
-
-  //creating the css for the element and appending it to the video controls bar
-  var a = document.createElement("p");
-  a.setAttribute("id", "title" + trackIndex)
-  a.setAttribute("style", "color: white; display: inline; float:right");
-  a.innerHTML = trackName;
-  document.getElementsByClassName("ytp-left-controls")[0].appendChild(a);
-}
-
-//function to remove title after you hover off time stamp
-function removeTitle(index){
-  var trackIndex = index.id.split("e")[1];
-  var element = document.getElementById("title" + trackIndex);
-  element.parentNode.removeChild(element);
-}
+    //listener for any changes (video size) on the screen
+    var timeout = null;
+    document.addEventListener("DOMSubtreeModified",
+    function(){
+    	if(timeout)clearTimeout(timeout);
+    	timeout = setTimeout(listener, 1500);
+    }, false);
 
 
+    function listener()
+    {
+    }
+
+    //function call to generate the time stamps
+    generateTimeStamps();
+
+    //function to get title of element being hovered over
+    function songInfo(index){
+
+      var trackIndex = index.id.split("e")[1];
+      var trackName = tracklist[trackIndex];
+
+      //regex matching to get song title
+      const regex = /[A-Z].*/g;
+      trackName = trackName.match(regex)[0]
+
+      //creating the css for the element and appending it to the video controls bar
+      var a = document.createElement("p");
+      a.setAttribute("id", "title" + trackIndex)
+      a.setAttribute("style", "color: white; display: inline; float:right");
+      a.innerHTML = trackName;
+      document.getElementsByClassName("ytp-left-controls")[0].appendChild(a);
+    }
+
+    //function to remove title after you hover off time stamp
+    function removeTitle(index){
+      var trackIndex = index.id.split("e")[1];
+      var element = document.getElementById("title" + trackIndex);
+      element.parentNode.removeChild(element);
+    }
+
+    //Display current song title without hover
+    //
+    // function displayTitle(positions, left, right){
+    //   var currPosition = document.getElementsByClassName("ytp-scrubber-container")[0].style;
+    //   currPosition = currPosition.transform.split("(")[1].split(")")[0].split("p")[0];
+    //
+    //   while(currPosition > positions[left] && currPosition < positions[right]){
+    //     console.log(currPosition);
+    //   }
+    // }
+    //
+    // displayTitle();
 
 });
-
-//response.items[0].snippet.topLevelComment.snippet.textOriginal

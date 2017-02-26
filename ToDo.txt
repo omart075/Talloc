@@ -6,3 +6,5 @@
 6. adjust accuracy
 	- make squares more accurate
 	- when click, auto adjust progress bar to start of square
+
+
