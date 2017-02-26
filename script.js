@@ -53,7 +53,7 @@ chrome.runtime.sendMessage({
     }
     //console.log(tracklist);
     function generateTimeStamps(){
-    console.log(tracklist[6])
+    console.log(tracklist)
     for(var i = 0; i < tracklist.length; i++){
     vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
 
@@ -65,17 +65,17 @@ chrome.runtime.sendMessage({
 
     var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
 
-    var vidLengthInSec = vidLength.split(":")[0] * 3600 + vidLength.split(":")[1] * 60 + Number(vidLength.split(":")[2]);
+    var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
 
-    console.log(vidLengthInSec + " " + vidWidthPx);
+    //console.log(vidLengthInSec + " " + vidWidthPx);
     var secPerPx = vidLengthInSec / vidWidthPx;
-    console.log(timeStampInSec + " " + secPerPx);
-    var timeStampPos = (timeStampInSec / secPerPx) - 1.5;
-    console.log(timeStampPos)
+    //console.log(timeStampInSec + " " + secPerPx);
+    var timeStampPos = (timeStampInSec / secPerPx - 5);
+    //console.log(timeStampPos)
     //console.log(document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth);
     var a = document.createElement("div");
     a.setAttribute("id", "square" + i);
-    a.setAttribute("style", "width:5px; height:2.5px; background:orange; float: left; transform: translateX(" + timeStampPos + "px);");
+    a.setAttribute("style", "width:5px; height:2.5px; background:orange; margin-bottom: 8px; display: inline-block; transform: translateX(" + timeStampPos + "px);");
     document.getElementsByClassName("ytp-progress-bar")[0].appendChild(a);
 
 
