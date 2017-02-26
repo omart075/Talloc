@@ -23,9 +23,6 @@ chrome.runtime.sendMessage({
     var tracklistStr;
     var tracklist;
     var positions = [];
-    var left =  0;
-    var right = 0;
-    var currPos = 0;
 
     //first regex returns array so array is made into string for next regex
     for(var i = 0; i < tracklistArr.length; i++){
@@ -81,10 +78,6 @@ chrome.runtime.sendMessage({
         element = document.getElementById("square" + i);
         element.onmouseover = function(){songInfo(this)};
         element.onmouseout = function(){removeTitle(this)};
-
-
-        currPos = document.getElementsByClassName("ytp-scrubber-container")[0].style.transform.addEventListener("onchange", getCurrPos);
-        console.log(currPos)
 
       }
     }
@@ -308,8 +301,3 @@ chrome.runtime.sendMessage({
     // displayTitle();
 
 });
-
-function getCurrPos(){
-  var currPos = Number(document.getElementsByClassName("ytp-scrubber-container")[0].style.transform.split("(")[1].split(")")[0].split("p")[0]);
-  return currPos;
-}
