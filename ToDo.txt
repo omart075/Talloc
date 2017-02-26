@@ -1,0 +1,8 @@
+1. adjust color and height of squares (on hover)
+2. keep track of name by progress bar
+3. more regex patterns
+4. fullscreen resizing
+5. work for hours
+6. adjust accuracy
+	- make squares more accurate
+	- when click, auto adjust progress bar to start of square
