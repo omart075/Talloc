@@ -232,7 +232,29 @@ chrome.runtime.sendMessage({
         element = document.getElementById("square" + i);
         element.onmouseover = function(){songInfo(this)};
         element.onmouseout = function(){removeTitle(this)};
+
       }
+
+      //detects the change in position of the progress bar
+      var element = document.getElementsByClassName("ytp-scrubber-container")[0];
+      var observer = new WebKitMutationObserver(function (mutations) {
+        mutations.forEach(attrModified);
+      });
+
+      observer.observe(element, { attributes: true });
+
+      function attrModified(mutation) {
+        var name = mutation.attributeName,
+        newValue = mutation.target.getAttribute(name),
+        oldValue = mutation.oldValue;
+
+        console.log(name, newValue, oldValue);
+      }
+
+
+      // document.getElementsByClassName("ytp-scrubber-container")[0].addEventListener("DOMAttrModified", function (){
+      // 	console.log(document.getElementsByClassName("ytp-scrubber-container")[0].style.transform)
+      // }, false);
     }
 
     //function to remove song title after you hover off the time stamp
