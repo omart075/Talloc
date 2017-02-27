@@ -192,6 +192,29 @@ chrome.runtime.sendMessage({
 
     }
 
+
+    function DisplayTitle(positions, vidPos)
+    {
+      var i = 0;
+      while(i < positions.length)
+      {
+        if(vidPos >= positions[i])
+        {
+          i++;
+          UpdateTitle(i);
+        }
+      }
+    }
+
+    function UpdateTitle(i)
+    {
+      trackName = tracklist[i];
+      var a = document.createElement("p");
+      a.setAttribute("id", "title" + trackIndex)
+      a.setAttribute("style", "color: white; display: inline; float:right");
+      a.innerHTML = trackName;
+      document.getElementsByClassName("ytp-left-controls")[0].appendChild(a);
+    }
     //renders time stamps onto video
     function generateTimeStamps(){
       console.log(tracklist)
@@ -234,10 +257,10 @@ chrome.runtime.sendMessage({
         element.onmouseout = function(){removeTitle(this)};
 
       }
-      console.log(positions)
-      var currTime = document.getElementById("movie_player");
-      console.log(currTime)
-      //detects the change in position of the progress bar
+      //console.log(positions)
+      // video = document.getElementsByClassName('video-stream')[0];
+      // console.log(video.currentTime);
+      // //detects the change in position of the progress bar
       // var element = document.getElementsByClassName("ytp-scrubber-container")[0];
       // var observer = new WebKitMutationObserver(function (mutations) {
       //   mutations.forEach(attrModified);
@@ -252,7 +275,7 @@ chrome.runtime.sendMessage({
       //
       //   console.log(name, newValue, oldValue);
       //   displayTitle(positions, newValue);
-      // }
+
     }
 
     //listener for any changes (video size) on the screen
@@ -266,6 +289,8 @@ chrome.runtime.sendMessage({
 
     function listener()
     {
+      //video = document.getElementsByClassName('video-stream')[0];
+      //console.log(video.currentTime);
     }
 
     //function call to generate the time stamps
@@ -295,10 +320,17 @@ chrome.runtime.sendMessage({
       var element = document.getElementById("title" + trackIndex);
       element.parentNode.removeChild(element);
     }
+    var t=setInterval(getCurrentVideoPosition,1000);
 
-    // function displayTitle(positions, newValue){
-    //   console.log(positions)
-    //   console.log(newValue)
-    // }
-
+    function getCurrentVideoPosition()
+    {
+      var currentVideoSec = document.getElementsByClassName('video-stream')[0].currentTime;
+      var vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
+      var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
+      var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
+      var secPerPx = vidLengthInSec / vidWidthPx;
+      var currentVideoPos = (currentVideoSec / secPerPx);
+      console.log(currentVideoPos);
+      return currentVideoPos;
+    }
 });
