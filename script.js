@@ -234,38 +234,25 @@ chrome.runtime.sendMessage({
         element.onmouseout = function(){removeTitle(this)};
 
       }
-
+      console.log(positions)
+      var currTime = document.getElementById("movie_player");
+      console.log(currTime)
       //detects the change in position of the progress bar
-      var element = document.getElementsByClassName("ytp-scrubber-container")[0];
-      var observer = new WebKitMutationObserver(function (mutations) {
-        mutations.forEach(attrModified);
-      });
-
-      observer.observe(element, { attributes: true });
-
-      function attrModified(mutation) {
-        var name = mutation.attributeName,
-        newValue = mutation.target.getAttribute(name),
-        oldValue = mutation.oldValue;
-
-        console.log(name, newValue, oldValue);
-      }
-
-
-      // document.getElementsByClassName("ytp-scrubber-container")[0].addEventListener("DOMAttrModified", function (){
-      // 	console.log(document.getElementsByClassName("ytp-scrubber-container")[0].style.transform)
-      // }, false);
-    }
-
-    //function to remove song title after you hover off the time stamp
-    function removeTimeStamps(){
-      for (var i=0; i < tracklist.length; i++)
-      {
-        try{
-        var element = document.getElementById("square" + i);
-        element.parentNode.removeChild(element);
-      } catch(err){break;}
-      }
+      // var element = document.getElementsByClassName("ytp-scrubber-container")[0];
+      // var observer = new WebKitMutationObserver(function (mutations) {
+      //   mutations.forEach(attrModified);
+      // });
+      //
+      // observer.observe(element, { attributes: true });
+      //
+      // function attrModified(mutation) {
+      //   var name = mutation.attributeName,
+      //   newValue = mutation.target.getAttribute(name),
+      //   oldValue = mutation.oldValue;
+      //
+      //   console.log(name, newValue, oldValue);
+      //   displayTitle(positions, newValue);
+      // }
     }
 
     //listener for any changes (video size) on the screen
@@ -309,17 +296,9 @@ chrome.runtime.sendMessage({
       element.parentNode.removeChild(element);
     }
 
-    //Display current song title without hover
-    //
-    // function displayTitle(positions, left, right){
-    //   var currPosition = document.getElementsByClassName("ytp-scrubber-container")[0].style;
-    //   currPosition = currPosition.transform.split("(")[1].split(")")[0].split("p")[0];
-    //
-    //   while(currPosition > positions[left] && currPosition < positions[right]){
-    //     console.log(currPosition);
-    //   }
+    // function displayTitle(positions, newValue){
+    //   console.log(positions)
+    //   console.log(newValue)
     // }
-    //
-    // displayTitle();
 
 });
