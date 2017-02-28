@@ -347,9 +347,9 @@ chrome.runtime.sendMessage({
       //creates and adds element to video
 
       a.setAttribute("id", "title" + trackIndex)
-      a.setAttribute("style", "color: black; display: inline; float:right");
-      a.innerHTML = trackName[1];
-      document.getElementsByClassName("search-form consolidated-form")[0].appendChild(a);
+      a.setAttribute("style", "color: white; display: block; float:left; position: absolute; margin-top: 20px; margin-left: 15px; font-size:16px");
+      a.innerHTML = "Now Playing: " + trackName[1];
+      document.getElementsByClassName("ytp-gradient-bottom")[0].appendChild(a);
     }
 
     function getCurrentVideoPosition()
