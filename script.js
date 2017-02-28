@@ -289,8 +289,6 @@ chrome.runtime.sendMessage({
 
     function listener()
     {
-      //video = document.getElementsByClassName('video-stream')[0];
-      //console.log(video.currentTime);
     }
 
     //function call to generate the time stamps
@@ -320,17 +318,49 @@ chrome.runtime.sendMessage({
       var element = document.getElementById("title" + trackIndex);
       element.parentNode.removeChild(element);
     }
-    var t=setInterval(getCurrentVideoPosition,1000);
+
+    //gets current position of video every second
+    var t = setInterval(getCurrentVideoPosition,1000);
+    var a = document.createElement("p");
+
+    function displayTitle(currentVideoPos){
+      var trackIndex = 0;
+      var currPos = 0;
+      var nextPos = 0;
+
+      //finds the position of a song that matches the position of the video
+      while(currentVideoPos > positions[currPos]){
+        currPos++;
+      }
+
+      trackIndex = currPos - 1;
+      nextPos = i;
+
+      var temp = tracklist[trackIndex];
+      var trackName = [];
+
+      //gets the song name by removing time from string
+      temp = temp.split(" ");
+      trackName.push(temp.shift());
+      trackName.push(temp.join(" "));
+
+      //creates and adds element to video
+
+      a.setAttribute("id", "title" + trackIndex)
+      a.setAttribute("style", "color: black; display: inline; float:right");
+      a.innerHTML = trackName[1];
+      document.getElementsByClassName("search-form consolidated-form")[0].appendChild(a);
+    }
 
     function getCurrentVideoPosition()
     {
       var currentVideoSec = document.getElementsByClassName('video-stream')[0].currentTime;
-      var vidWidthPx = document.getElementsByClassName("ytp-progress-bar-padding")[0].offsetWidth;
+      var vidWidthPx = document.getElementsByClassName("ytp-progress-bar")[0].offsetWidth;
       var vidLength = document.getElementsByClassName("ytp-time-duration")[0].innerHTML;
       var vidLengthInSec = vidLength.split(":")[0] * 60 + Number(vidLength.split(":")[1]);
       var secPerPx = vidLengthInSec / vidWidthPx;
       var currentVideoPos = (currentVideoSec / secPerPx);
-      console.log(currentVideoPos);
-      return currentVideoPos;
+
+      displayTitle(currentVideoPos);
     }
 });
